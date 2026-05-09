@@ -1,10 +1,10 @@
-🧱 SOC Lab — Threat Detection & Automated Response with Wazuh
+# SOC Lab — Threat Detection & Automated Response with Wazuh
 
 A hands-on SOC lab where I simulated real attacks, wrote custom Wazuh detection rules, and configured automated IP blocking using iptables — all on a local virtualized network.
 
 ---
 
-# What This Lab Does
+## What This Lab Does
 
 * Simulates real attacks (port scanning, SSH brute force) using Kali Linux
 * Detects them using custom Wazuh rules mapped to MITRE ATT&CK
@@ -12,22 +12,22 @@ A hands-on SOC lab where I simulated real attacks, wrote custom Wazuh detection 
 
 ---
 
-#🔎 Lab Architecture
+## Lab Architecture
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │                VirtualBox (Host: Windows)           │
 │                                                     │
 │  ┌──────────────────────┐  ┌──────────────────────┐ │
-│  │   Kali Linux          │  │  Ubuntu Server 24.04 ││
-│  │   (Attacker +         │  │  (Target Machine +   ││
-│  │    Wazuh Manager)     │  │   Wazuh Agent)       ││
-│  │                       │  │                      ││
-│  │  • Wazuh Manager      │◄─│  • Wazuh Agent 002   ││
-│  │  • Wazuh Dashboard    │  │  • SSH  (Port 22)    ││
-│  │  • Wazuh Indexer      │  │  • FTP  (Port 21)    ││
-│  │  • Hydra              │  │  • HTTP (Port 80)    ││
-│  │  • Nmap               │  │  • iptables Firewall ││
+│  │   Kali Linux         │  │  Ubuntu Server 24.04 │ │
+│  │   (Attacker +        │  │  (Target Machine +   │ │
+│  │    Wazuh Manager)    │  │   Wazuh Agent)       │ │
+│  │                      │  │                      │ │
+│  │  • Wazuh Manager     │◄─│  • Wazuh Agent 002   │ │
+│  │  • Wazuh Dashboard   │  │  • SSH  (Port 22)    │ │
+│  │  • Wazuh Indexer     │  │  • FTP  (Port 21)    │ │
+│  │  • Hydra             │  │  • HTTP (Port 80)    │ │
+│  │  • Nmap              │  │  • iptables Firewall │ │
 │  └──────────────────────┘  └──────────────────────┘ │
 │          Network: Bridged Adapter                   │
 └─────────────────────────────────────────────────────┘
@@ -35,7 +35,7 @@ A hands-on SOC lab where I simulated real attacks, wrote custom Wazuh detection 
 
 ---
 
-#🔨 Tools Used
+## Tools Used
 
 
 1. Wazuh 4.x -- SIEM — log analysis, detection, active response 
@@ -48,7 +48,7 @@ A hands-on SOC lab where I simulated real attacks, wrote custom Wazuh detection 
 
 ---
 
-#📎 Attacks Simulated
+## Attacks Simulated
 
 1. Port Scan (Nmap)
 
@@ -57,6 +57,7 @@ nmap -sS -p 1-1000 <target-ip>
 ```
 Discovered open ports: 21 (FTP), 22 (SSH), 80 (HTTP)  
 MITRE ATT&CK: T1046 — Network Service Discovery
+
 <img width="1366" height="702" alt="image" src="https://github.com/user-attachments/assets/557a8ee4-b312-40f7-8452-dd9cf451126a" />
 
 
@@ -67,13 +68,14 @@ hydra -l root -P /usr/share/wordlists/rockyou.txt ssh://<target-ip> -t 4
 ```
 Generated hundreds of failed login attempts  
 MITRE ATT&CK: T1110 — Brute Force
+
 <img width="1366" height="702" alt="image" src="https://github.com/user-attachments/assets/e805d31c-e3d3-4506-b617-1fe60518c6ea" />
 
 ---
 
-# Custom Detection Rules
+## Custom Detection Rules
 
-I Stored the custom commands in separate as local_rules.xml and to congfig it in location `/var/ossec/etc/rules/local_rules.xml`:
+Stored in `/var/ossec/etc/rules/local_rules.xml`:
 
 ```xml
 <group name="local,">
@@ -124,6 +126,7 @@ When Rule 100006 fires (6+ failed logins in 120 seconds):
 2. The `firewall-drop` script runs on the target machine
 3. Attacker IP gets added to iptables DROP rules
 4. Block lifts automatically after 300 seconds
+
 <img width="1366" height="702" alt="image" src="https://github.com/user-attachments/assets/804794b6-5ec5-44d7-af2c-6b77cb3f8134" />
 Verification of automated Ip drop
 
@@ -138,17 +141,20 @@ Verification of automated Ip drop
 </active-response>
 ```
 
-* Resulting iptables rule:
+**Resulting iptables rule:**
 ```bash
 iptables -I INPUT -s <attacker-ip> -j DROP
 ```
-before the command
+before:
+
 <img width="994" height="768" alt="WhatsApp Image 2026-05-09 at 8 08 00 PM" src="https://github.com/user-attachments/assets/adb1b899-1e2c-4c48-8955-c3fe90c9aafb" />
-after the command
+after:
+
+<img width="1080" height="838" alt="image" src="https://github.com/user-attachments/assets/763b5fef-180f-46b2-9ca9-176b246bc562" />
 
 ---
 
-# 📊 Alerts Generated
+## Alerts Generated
 
 | Rule ID   | Description                                      | Level | MITRE     | Notes                     |
 |-----------|--------------------------------------------------|-------|-----------|---------------------------|
@@ -159,38 +165,40 @@ after the command
 | 651       | Host Blocked by firewall-drop                    | 3     | -         | Active Response           |
 ---
 
-# 📖Incident Response Playbook
+## Incident Response Playbook
 
-SSH Brute Force — Rule 100006
+### SSH Brute Force — Rule 100006
 
-1. Detect -- Rule 100006 fires — 6+ failed SSH logins in 120 seconds
-2. Auto -- Contain,Wazuh automatically blocks attacker IP using firewall-drop
-3. Investigate -- Check source IP, timestamp, and attack frequency in Wazuh Threat Hunting
-4. Analyze -- Verify if any login was successful (journalctl -u ssh or /var/log/auth.log)
-5. Eradicate -- If breach confirmed: Rotate credentials, audit user accounts, remove unauthorized access
-6. Recover -- Verify system integrity, remove blocks if needed, re-enable services safely
-7. Document -- Record IOCs (attacker IP, timestamp), timeline, and all actions taken
+|   |Step         | Action                                                                               |
+|---|-------------|--------------------------------------------------------------------------------------|
+| 1 | Detect      | Rule 100006 fires — 6+ failed SSH logins in 120 seconds                              |
+| 2 | Auto-Contain| Wazuh automatically blocks attacker IP using firewall-drop                           |
+| 3 | Investigate | Check source IP, timestamp, and attack frequency in Wazuh Threat Hunting             |
+| 4 | Analyze     | Verify if any login was successful (`journalctl -u ssh` or `/var/log/auth.log`)      |
+| 5 | Eradicate   | If breach confirmed — rotate credentials, audit accounts, remove unauthorized access |
+| 6 | Recover     | Verify system integrity, remove blocks if needed, re-enable services safely          |
+| 7 | Document    | Record IOCs (attacker IP, timestamp), timeline, and all actions taken                |
 
 ---
 
 
-#🏫 What I Learned
+## What I Learned
 
 * Installing and configuring Wazuh SIEM from scratch
-* Writing custom XML detection rules with MITRE ATT&CK mapping with help of AI
+* Writing custom XML detection rules with MITRE ATT&CK mapping 
 * Setting up active response for automated threat containment
 * Reading and analyzing logs from journald and syslog
 * Simulating attacks with Hydra and Nmap
-* Troubleshooting VM network issues 
+* Troubleshooting VM network issues (nftables didn't work on Ubuntu 24.04, switched to iptables)
 * Working with iptables firewall rules
 
 ---
 
-#🙍 Author
+## Author
 
-Hi I'm Gokul Sundar C and a Aspiring SOC Analyst and Cybersecurity Enthusiast. 
+Hi I'm Gokul Sundar C and an Aspiring SOC Analyst and Cybersecurity Enthusiast. 
 📧 gokulsundar.x07@gmail.com  
-🔗 www.linkedin.com/in/thegokulsundar
+🔗 https://www.linkedin.com/in/thegokulsundar
 
 ---
 
