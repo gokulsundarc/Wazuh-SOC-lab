@@ -1,0 +1,44 @@
+<!-- Custom SOC Lab Rules by Gokul Sundar -->
+<group name="local,">
+
+  <!-- BRUTE FORCE DETECTION -->
+  <rule id="100001" level="10" frequency="3" timeframe="120">
+    <if_matched_sid>5716</if_matched_sid>
+    <description>Custom: SSH Brute Force Attack Detected from same source</description>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+    <group>attack,authentication_failures,</group>
+  </rule>
+
+  <rule id="100002" level="12" frequency="10" timeframe="60">
+    <if_matched_sid>5716</if_matched_sid>
+    <description>Custom: High Volume SSH Brute Force - Possible Automated Attack</description>
+    <mitre>
+      <id>T1110.001</id>
+    </mitre>
+    <group>attack,authentication_failures,</group>
+  </rule>
+
+  <!-- PRIVILEGE ESCALATION DETECTION -->
+  <rule id="100005" level="12">
+    <if_sid>5402</if_sid>
+    <match>root</match>
+    <description>Custom: Privilege Escalation - Sudo to ROOT Executed</description>
+    <mitre>
+      <id>T1548.003</id>
+    </mitre>
+    <group>attack,privilege_escalation,</group>
+  </rule>
+
+  <!-- MULTIPLE FAILED LOGINS -->
+  <rule id="100006" level="10" frequency="6" timeframe="120">
+    <if_matched_sid>5503</if_matched_sid>
+    <description>Custom: Multiple PAM Authentication Failures Detected</description>
+    <mitre>
+      <id>T1110</id>
+    </mitre>
+    <group>attack,authentication_failures,</group>
+  </rule>
+
+</group>
