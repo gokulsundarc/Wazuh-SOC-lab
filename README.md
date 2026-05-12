@@ -163,6 +163,7 @@ after:
 | 40111     | Multiple authentication failures                 | 10    | T1110     | Wazuh default rule        |
 | 100006    | Custom: Multiple PAM Auth Failures               | 10    | T1110     | Triggers Active Response  |
 | 651       | Host Blocked by firewall-drop                    | 3     | -         | Active Response           |
+| 652       | Host unblocked by firewall-drop                  | 3     | -         | Active Response           |
 ---
 
 ## Incident Response Playbook
