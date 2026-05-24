@@ -43,6 +43,10 @@ A hands-on Security Operations Center (SOC) lab where I simulated real-world cyb
 
 The Wazuh Agent was registered on Ubuntu Server with **Agent ID: 002** and appears as **Active** in the Wazuh Dashboard under Endpoints. Both VMs use **Bridged Adapter** so they can communicate directly on the same network.
 
+
+<img width="1366" height="702" alt="Screenshot_2026-05-19_10_01_51" src="https://github.com/user-attachments/assets/fc938643-5508-43bf-ac05-dc1ba512e6a5" />
+
+
 ---
 
 ## 🛠️ Tools Used
@@ -69,6 +73,9 @@ The Wazuh Agent was registered on Ubuntu Server with **Agent ID: 002** and appea
 nmap -sS -p 1-1000 <target-ip>
 ```
 
+<img width="1366" height="702" alt="Screenshot_2026-05-09_09_10_56" src="https://github.com/user-attachments/assets/5c2db3e1-e8cc-42b9-8a65-fdb076beb57a" />
+
+
 **Open ports discovered:** 21 (FTP), 22 (SSH), 80 (HTTP)
 **MITRE ATT&CK:** T1046 — Network Service Discovery
 
@@ -80,7 +87,12 @@ nmap -sS -p 1-1000 <target-ip>
 hydra -l root -P /usr/share/wordlists/rockyou.txt ssh://<target-ip> -t 4
 ```
 
+<img width="1366" height="702" alt="Screenshot_2026-05-09_04_38_37" src="https://github.com/user-attachments/assets/816b68a3-7756-46cd-8c51-89557c1148e1" />
+
 Generated over 64 failed login attempts per minute against the SSH service.
+
+<img width="1366" height="702" alt="Screenshot_2026-05-09_04_44_18" src="https://github.com/user-attachments/assets/946695dc-40e3-449d-8fdc-e5ddf90532a0" />
+
 **MITRE ATT&CK:** T1110 — Brute Force
 
 ---
@@ -91,7 +103,12 @@ Generated over 64 failed login attempts per minute against the SSH service.
 hydra -l admin -P /usr/share/wordlists/rockyou.txt ftp://<target-ip> -t 4
 ```
 
+<img width="1366" height="702" alt="Screenshot_2026-05-24_01_52_13" src="https://github.com/user-attachments/assets/459169a6-915a-4ad9-b9d0-d85a82953c63" />
+
 Hundreds of failed FTP login attempts captured from `/var/log/vsftpd.log`.
+
+<img width="1366" height="702" alt="Screenshot_2026-05-24_02_01_06" src="https://github.com/user-attachments/assets/eaf5007a-1f8a-4e6a-9f83-9b0be639fd53" />
+
 **MITRE ATT&CK:** T1110 — Brute Force
 
 ---
@@ -105,7 +122,12 @@ curl http://<target-ip>/wp-admin
 curl 'http://<target-ip>/?id=1'\''OR'\''1'\''='\''1'
 ```
 
+<img width="1366" height="702" alt="Screenshot_2026-05-24_02_05_03" src="https://github.com/user-attachments/assets/07e5dccc-abd1-4d0e-8a5d-523dd62c8987" />
+
 Web vulnerability scanning, directory traversal, and SQL injection attempts.
+
+<img width="1366" height="702" alt="Screenshot_2026-05-24_02_06_22" src="https://github.com/user-attachments/assets/6e05c078-5f61-4cf5-9dd7-b2fb8bd6e126" />
+
 **MITRE ATT&CK:** T1595, T1083, T1190
 
 ---
@@ -206,6 +228,9 @@ When detection rules fire, Wazuh automatically:
 3. Attacker IP is added to **nftables/iptables DROP rules**
 4. Block is automatically lifted after **300 seconds (5 minutes)**
 
+<img width="1366" height="702" alt="Screenshot_2026-05-12_06_58_11" src="https://github.com/user-attachments/assets/6dd9f4ec-5cf8-4b4d-b52e-dc9f1bb118cf" />
+
+
 ```xml
 <active-response>
   <command>firewall-drop</command>
@@ -235,8 +260,8 @@ Ubuntu 24.04 uses **nftables as the kernel firewall backend**. The `iptables` co
 
 ```
 iptables (compatibility layer)  ──┐
-                                   ├──► nftables (kernel firewall)
-nft (native interface)            ──┘
+                                  ├──► nftables (kernel firewall)
+nft (native interface)          ──┘
 ```
 
 During testing, SSH blocks appeared in `iptables -L INPUT` while FTP and HTTP blocks appeared in `nft list ruleset`. SOC analysts should check both interfaces on modern Ubuntu systems.
@@ -273,6 +298,8 @@ Ubuntu 24.04 no longer uses `/var/log/auth.log` by default — it uses **journal
   <location>journald</location>
 </localfile>
 ```
+<img width="537" height="179" alt="Screenshot_2026-05-19_06_45_48" src="https://github.com/user-attachments/assets/d745d173-7f77-4912-9560-59b5f73cdff0" />
+
 
 ### FTP IPv6 Fix
 vsftpd on Ubuntu 24.04 logs IPs in IPv6-mapped format (`::ffff:10.x.x.x`). To force IPv4 logging, add to `/etc/vsftpd.conf`:
@@ -295,6 +322,8 @@ FTP attacks triggered multiple Telegram messages. Fixed using `repeated_offender
 </active-response>
 ```
 
+<img width="1366" height="702" alt="Screenshot_2026-05-24_02_35_54" src="https://github.com/user-attachments/assets/79961160-cec5-4ad1-b470-fdc3f6e21e47" />
+
 ---
 
 ## 📱 Telegram Bot Integration
@@ -316,6 +345,9 @@ A custom Telegram Bot provides **real-time mobile alerts** and **interactive SOC
 🛡️ Auto-block initiated!
 ```
 
+<img width="393" height="242" alt="alert" src="https://github.com/user-attachments/assets/6258566a-ff3a-4c46-af10-1fde2c982450" />
+
+
 ### Interactive Bot Commands
 
 | Command | Description |
@@ -325,6 +357,10 @@ A custom Telegram Bot provides **real-time mobile alerts** and **interactive SOC
 | `/alerts` | Show last 5 security alerts |
 | `/blocked` | Show currently blocked IPs |
 | `/clear` | Clear all firewall blocks |
+
+
+<img width="594" height="768" alt="alert2" src="https://github.com/user-attachments/assets/e498b1db-8844-4a82-8694-934caec7276e" />  <img width="569" height="768" alt="alert3" src="https://github.com/user-attachments/assets/f6bd9d2e-da6b-4333-a5f5-5dc384d949b3" />
+
 
 ### Bot Files
 - [`telegram-alert.sh`](./telegram-alert.sh) — Active response script for automatic Wazuh alerts
