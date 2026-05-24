@@ -359,7 +359,7 @@ A custom Telegram Bot provides **real-time mobile alerts** and **interactive SOC
 | `/clear` | Clear all firewall blocks |
 
 
-<img width="579" height="732" alt="alert2" src="https://github.com/user-attachments/assets/e81fe5d8-2474-456f-baaf-164b099e306c" />
+<img width="569" height="732" alt="alert2" src="https://github.com/user-attachments/assets/e2fa3bc7-6f62-4946-8057-5954bb27b9ef" />
 <img width="569" height="732" alt="alert3" src="https://github.com/user-attachments/assets/552e0df8-f4c2-4e32-b84e-5c7dd22e692d" />
 
 
